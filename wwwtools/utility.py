@@ -95,6 +95,7 @@ def repl(match):
 
 
 def tex_esc(text):
+    text = text.replace('″', '"')
     text = text.replace("⇧", "")
     text = text.replace("_", "\\_")
     text = text.replace("{", "\\{")
