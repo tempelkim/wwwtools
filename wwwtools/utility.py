@@ -105,6 +105,6 @@ def tex_esc(text):
     text = text.replace("%", "\\%")
     text = text.replace("#", "\\#")
     text = text.replace("$", "\\$")
-    text = text.replace("^", "\\^")
+    text = text.replace("^", "\\textasciicircum{}")
     text = text.replace("~", "\\textasciitilde{}")
     return text
