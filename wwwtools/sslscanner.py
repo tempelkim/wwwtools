@@ -91,11 +91,16 @@ class SSLScanner(object):
 
     @property
     def public_key(self):
-        cert = self.cert_info.certificate_chain[0]
-        public_key = cert.public_key()
+        public_key = self.cert_info.certificate_chain[0].public_key()
         if isinstance(public_key, rsa.RSAPublicKey):
-            return 'RSA key: {}bit'.format(public_key.key_size)
+            return 'RSA key: {}bit, Exponent {}'.format(
+                    public_key.key_size, public_key.public_numbers().e)
         return 'TBD'
+
+    @property
+    def signature(self):
+        cert = self.cert_info.certificate_chain[0]
+        return cert.signature_hash_algorithm.name
 
     def _get_certificate_info(self):
         command = CertificateInfoScanCommand()

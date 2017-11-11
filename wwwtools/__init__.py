@@ -9,3 +9,4 @@ from .request_list import RequestList
 from .geo_ip import GeoIP
 from .utility import fetch_page, percentage, tex_esc
 from .sslscanner import SSLScanner
+from .ciphersuite import CipherSuite
