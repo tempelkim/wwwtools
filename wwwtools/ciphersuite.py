@@ -20,6 +20,10 @@ KEX_ALGORITHMS = {
         'anon': True,
         'type': 'ec',
     },
+    'ECDH_anon': {
+        'anon': True,
+        'type': 'ec',
+    },
     'ECDH_anon_EXPORT': {
         'anon': True,
         'export': True,
