@@ -83,7 +83,6 @@ class SSLScanner(object):
         rv = ''
         cert = self.cert_info.certificate_chain[0]
         for attrib in cert.subject:
-            logger.debug('ATTRIB: {}'.format(attrib.value))
             if rv != '':
                 rv += ', '
             rv += attrib.value

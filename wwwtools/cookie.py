@@ -11,8 +11,10 @@ class Cookie:
     def __init__(self, start_time, cookie_dict):
         self.start_time = start_time
         try:
-            self.expires = datetime.fromtimestamp(
-                    cookie_dict['expires'] / 1000, timezone.utc)
+            exp = cookie_dict['expires']
+            if exp > 154419191800:
+                exp = exp / 1000
+            self.expires = datetime.fromtimestamp(exp, timezone.utc)
         except ValueError:
             self.expires = datetime(2038, 1, 1, tzinfo=timezone.utc)
         self.name = cookie_dict['name']
