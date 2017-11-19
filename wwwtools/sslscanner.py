@@ -209,8 +209,14 @@ class SSLScanner(object):
 
     def scan(self):
         self.check_http_redirect()
+        logger.debug('check_http_redirect() done')
         self._get_certificate_info()
+        logger.debug('_get_certificate_info() done')
         self._get_ciphers()
+        logger.debug('_get_ciphers() done')
         self.headerscan()
+        logger.debug('headerscan() done')
         # self.scan_heartbleed()
+        # logger.debug('scan_heartbleed() done')
         self.scan_opensslccs()
+        logger.debug('scan_opensslccs) done')
