@@ -212,5 +212,5 @@ class SSLScanner(object):
         self._get_certificate_info()
         self._get_ciphers()
         self.headerscan()
-        self.scan_heartbleed()
+        # self.scan_heartbleed()
         self.scan_opensslccs()

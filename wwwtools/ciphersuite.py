@@ -186,6 +186,8 @@ class CipherSuite:
         self.score = None
 
         tokens = suite_name.split('_')
+        if tokens[0] == 'OLD':
+            tokens.pop(0)
         if tokens[0] != 'TLS' and tokens[0] != 'SSL':
             logger.warn('Not a TLS ciphersuite: {}'.format(suite_name))
             return
@@ -246,7 +248,11 @@ class CipherSuite:
                 self.hash = tokens[i]
 
     def get_key_strength(self, cert):
-        kex = KEX_ALGORITHMS[self.kex]
+        try:
+            kex = KEX_ALGORITHMS[self.kex]
+        except KeyError:
+            logger.error('KeyError KEX_ALGORITHMS[{}]'.format(self.kex))
+            return
         pubkey = cert.public_key()
         if 'anon' in kex:
             self.key_strength = 0
