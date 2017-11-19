@@ -115,7 +115,7 @@ class SSLScanner(object):
                 logger.debug('RSA key: {} bit'.format(public_key.key_size))
             for issuer in cert.issuer.get_attributes_for_oid(
                     NameOID.COMMON_NAME):
-                print(
+                logger.debug(
                         'Issuer: {} (until {})'.format(
                                 issuer.value, cert.not_valid_after)
                 )
