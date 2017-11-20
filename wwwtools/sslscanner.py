@@ -9,6 +9,7 @@ from sslyze.plugins.openssl_ccs_injection_plugin import \
 from sslyze.synchronous_scanner import SynchronousScanner
 from sslyze.plugins.http_headers_plugin import HttpHeadersScanCommand
 from sslyze.utils.ssl_connection import SSLHandshakeRejected
+from sslyze.ssl_settings import TlsWrappedProtocolEnum
 from cryptography.x509 import NameOID
 from cryptography.hazmat.primitives.asymmetric import rsa
 import logging
@@ -23,7 +24,10 @@ class SSLScanner(object):
     def __init__(self, hostname):
         self.hostname = hostname
         try:
-            self.server_info = ServerConnectivityInfo(hostname=self.hostname)
+            self.server_info = ServerConnectivityInfo(
+                    hostname=self.hostname,
+                    tls_server_name_indication=self.hostname,
+            )
             self.server_info.test_connectivity_to_server()
         except ServerConnectivityError as e:
             # Could not establish an SSL connection to the server
@@ -47,6 +51,7 @@ class SSLScanner(object):
         }
         self.headers = False
         self.redirects_http = False
+        self.errors = []
 
     @property
     def hsts_header(self):
@@ -129,6 +134,13 @@ class SSLScanner(object):
                     self.server_info, command)
         except ConnectionResetError:
             logger.error('Sslv20ScanCommand: ConnectionResetError')
+            self.errors.append('Sslv20ScanCommand: ConnectionResetError')
+        except SSLHandshakeRejected:
+            logger.error('Sslv20ScanCommand: SSLHandshakeRejected')
+            self.errors.append('Sslv20ScanCommand: SSLHandshakeRejected')
+        except Exception as e:
+            logger.exception('Sslv20ScanCommand failed with {}'.format(e))
+            self.errors.append('Sslv20ScanCommand failed with {}'.format(e))
         for cipher in scan_result.accepted_cipher_list:
             self.ciphers['ssl20'].append(cipher)
         # SSL 3.0
@@ -138,6 +150,13 @@ class SSLScanner(object):
                     self.server_info, command)
         except ConnectionResetError:
             logger.error('Sslv30ScanCommand: ConnectionResetError')
+            self.errors.append('Sslv30ScanCommand: ConnectionResetError')
+        except SSLHandshakeRejected:
+            logger.error('Sslv30ScanCommand: SSLHandshakeRejected')
+            self.errors.append('Sslv30ScanCommand: SSLHandshakeRejected')
+        except Exception as e:
+            logger.exception('Sslv30ScanCommand failed with {}'.format(e))
+            self.errors.append('Sslv30ScanCommand failed with {}'.format(e))
         for cipher in scan_result.accepted_cipher_list:
             self.ciphers['ssl30'].append(cipher)
         # TLS 1.0
@@ -147,6 +166,13 @@ class SSLScanner(object):
                     self.server_info, command)
         except ConnectionResetError:
             logger.error('Tlsv10ScanCommand: ConnectionResetError')
+            self.errors.append('Tlsv10ScanCommand: ConnectionResetError')
+        except SSLHandshakeRejected:
+            logger.error('Tlsv10canCommand: SSLHandshakeRejected')
+            self.errors.append('Tlsv10canCommand: SSLHandshakeRejected')
+        except Exception as e:
+            logger.exception('Tlsv10ScanCommand failed with {}'.format(e))
+            self.errors.append('Tlsv10ScanCommand failed with {}'.format(e))
         for cipher in scan_result.accepted_cipher_list:
             self.ciphers['tls10'].append(cipher)
         # TLS 1.1
@@ -156,6 +182,13 @@ class SSLScanner(object):
                     self.server_info, command)
         except ConnectionResetError:
             logger.error('Tlsv11ScanCommand: ConnectionResetError')
+            self.errors.append('Tlsv11ScanCommand: ConnectionResetError')
+        except SSLHandshakeRejected:
+            logger.error('Tlsv11canCommand: SSLHandshakeRejected')
+            self.errors.append('Tlsv11canCommand: SSLHandshakeRejected')
+        except Exception as e:
+            logger.exception('Tlsv11ScanCommand failed with {}'.format(e))
+            self.errors.append('Tlsv11ScanCommand failed with {}'.format(e))
         for cipher in scan_result.accepted_cipher_list:
             self.ciphers['tls11'].append(cipher)
         # TLS 1.2
@@ -165,6 +198,13 @@ class SSLScanner(object):
                     self.server_info, command)
         except ConnectionResetError:
             logger.error('Tlsv12ScanCommand: ConnectionResetError')
+            self.errors.append('Tlsv12ScanCommand: ConnectionResetError')
+        except SSLHandshakeRejected:
+            logger.error('Tlsv12canCommand: SSLHandshakeRejected')
+            self.errors.append('Tlsv12canCommand: SSLHandshakeRejected')
+        except Exception as e:
+            logger.exception('Tlsv12ScanCommand failed with {}'.format(e))
+            self.errors.append('Tlsv12ScanCommand failed with {}'.format(e))
         for cipher in scan_result.accepted_cipher_list:
             self.ciphers['tls12'].append(cipher)
 
@@ -175,12 +215,16 @@ class SSLScanner(object):
                     self.server_info, command)
         except socket.timeout:
             logger.error('headerscan timed out')
+            self.errors.append('headerscan timed out')
         except ConnectionResetError:
             logger.error('ConnectionResetError on headerscan')
+            self.errors.append('ConnectionResetError on headerscan')
         except SSLHandshakeRejected:
             logger.error('SSLHandshakeRejected on headerscan')
+            self.errors.append('SSLHandshakeRejected on headerscan')
         except Exception as e:
             logger.exception('headerscan failed with {}'.format(e))
+            self.errors.append('headerscan failed with {}'.format(e))
 
     def scan_heartbleed(self):
         command = HeartbleedScanCommand()
@@ -189,15 +233,19 @@ class SSLScanner(object):
                     self.server_info, command)
         except socket.timeout:
             logger.error('heartbleed timed out')
+            self.errors.append('heartbleed timed out')
             return
         except ConnectionResetError:
             logger.error('ConnectionResetError on heartbleedscan')
+            self.errors.append('ConnectionResetError on heartbleedscan')
             return
         except SSLHandshakeRejected:
             logger.error('SSLHandshakeRejected on heartbleedscan')
+            self.errors.append('SSLHandshakeRejected on heartbleedscan')
             return
         except Exception as e:
             logger.exception('heartbleed failed with {}'.format(e))
+            self.errors.append('heartbleed failed with {}'.format(e))
             return
         self.vulnerabilities['heartbleed'] = \
             scan_result.is_vulnerable_to_heartbleed
@@ -209,15 +257,19 @@ class SSLScanner(object):
                     self.server_info, command)
         except socket.timeout:
             logger.error('opensslccs timed out')
+            self.errors.append('opensslccs timed out')
             return
         except ConnectionResetError:
             logger.error('ConnectionResetError on opensslccsscan')
+            self.errors.append('ConnectionResetError on opensslccsscan')
             return
         except SSLHandshakeRejected:
             logger.error('SSLHandshakeRejected on opensslccsscan')
+            self.errors.append('SSLHandshakeRejected on opensslccsscan')
             return
         except Exception as e:
             logger.exception('opensslccs failed with {}'.format(e))
+            self.errors.append('opensslccs failed with {}'.format(e))
             return
         self.vulnerabilities['opensslccs'] = \
             scan_result.is_vulnerable_to_ccs_injection
