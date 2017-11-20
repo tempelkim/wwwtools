@@ -123,32 +123,47 @@ class SSLScanner(object):
     def _get_ciphers(self):
         # SSL 2.0
         command = Sslv20ScanCommand()
-        scan_result = self.synchronous_scanner.run_scan_command(
-                self.server_info, command)
+        try:
+            scan_result = self.synchronous_scanner.run_scan_command(
+                    self.server_info, command)
+        except ConnectionResetError:
+            logger.error('Sslv20ScanCommand: ConnectionResetError')
         for cipher in scan_result.accepted_cipher_list:
             self.ciphers['ssl20'].append(cipher)
         # SSL 3.0
         command = Sslv30ScanCommand()
-        scan_result = self.synchronous_scanner.run_scan_command(
-                self.server_info, command)
+        try:
+            scan_result = self.synchronous_scanner.run_scan_command(
+                    self.server_info, command)
+        except ConnectionResetError:
+            logger.error('Sslv30ScanCommand: ConnectionResetError')
         for cipher in scan_result.accepted_cipher_list:
             self.ciphers['ssl30'].append(cipher)
         # TLS 1.0
         command = Tlsv10ScanCommand()
-        scan_result = self.synchronous_scanner.run_scan_command(
-                self.server_info, command)
+        try:
+            scan_result = self.synchronous_scanner.run_scan_command(
+                    self.server_info, command)
+        except ConnectionResetError:
+            logger.error('Tlsv10ScanCommand: ConnectionResetError')
         for cipher in scan_result.accepted_cipher_list:
             self.ciphers['tls10'].append(cipher)
         # TLS 1.1
         command = Tlsv11ScanCommand()
-        scan_result = self.synchronous_scanner.run_scan_command(
-                self.server_info, command)
+        try:
+            scan_result = self.synchronous_scanner.run_scan_command(
+                    self.server_info, command)
+        except ConnectionResetError:
+            logger.error('Tlsv11ScanCommand: ConnectionResetError')
         for cipher in scan_result.accepted_cipher_list:
             self.ciphers['tls11'].append(cipher)
         # TLS 1.2
         command = Tlsv12ScanCommand()
-        scan_result = self.synchronous_scanner.run_scan_command(
-                self.server_info, command)
+        try:
+            scan_result = self.synchronous_scanner.run_scan_command(
+                    self.server_info, command)
+        except ConnectionResetError:
+            logger.error('Tlsv12ScanCommand: ConnectionResetError')
         for cipher in scan_result.accepted_cipher_list:
             self.ciphers['tls12'].append(cipher)
 
