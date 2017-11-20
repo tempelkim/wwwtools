@@ -8,6 +8,7 @@ from sslyze.plugins.openssl_ccs_injection_plugin import \
     OpenSslCcsInjectionScanCommand
 from sslyze.synchronous_scanner import SynchronousScanner
 from sslyze.plugins.http_headers_plugin import HttpHeadersScanCommand
+from sslyze.utils.ssl_connection import SSLHandshakeRejected
 from cryptography.x509 import NameOID
 from cryptography.hazmat.primitives.asymmetric import rsa
 import logging
@@ -174,10 +175,12 @@ class SSLScanner(object):
                     self.server_info, command)
         except socket.timeout:
             logger.error('headerscan timed out')
-            return
+        except ConnectionResetError:
+            logger.error('ConnectionResetError on headerscan')
+        except SSLHandshakeRejected:
+            logger.error('SSLHandshakeRejected on headerscan')
         except Exception as e:
             logger.exception('headerscan failed with {}'.format(e))
-            return
 
     def scan_heartbleed(self):
         command = HeartbleedScanCommand()
@@ -186,6 +189,12 @@ class SSLScanner(object):
                     self.server_info, command)
         except socket.timeout:
             logger.error('heartbleed timed out')
+            return
+        except ConnectionResetError:
+            logger.error('ConnectionResetError on heartbleedscan')
+            return
+        except SSLHandshakeRejected:
+            logger.error('SSLHandshakeRejected on heartbleedscan')
             return
         except Exception as e:
             logger.exception('heartbleed failed with {}'.format(e))
@@ -200,6 +209,12 @@ class SSLScanner(object):
                     self.server_info, command)
         except socket.timeout:
             logger.error('opensslccs timed out')
+            return
+        except ConnectionResetError:
+            logger.error('ConnectionResetError on opensslccsscan')
+            return
+        except SSLHandshakeRejected:
+            logger.error('SSLHandshakeRejected on opensslccsscan')
             return
         except Exception as e:
             logger.exception('opensslccs failed with {}'.format(e))
@@ -231,7 +246,7 @@ class SSLScanner(object):
         logger.debug('_get_ciphers() done')
         self.headerscan()
         logger.debug('headerscan() done')
-        # self.scan_heartbleed()
-        # logger.debug('scan_heartbleed() done')
+        self.scan_heartbleed()
+        logger.debug('scan_heartbleed() done')
         self.scan_opensslccs()
         logger.debug('scan_opensslccs) done')
