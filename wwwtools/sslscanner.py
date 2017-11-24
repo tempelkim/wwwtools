@@ -23,19 +23,6 @@ class SSLScanner(object):
 
     def __init__(self, hostname):
         self.hostname = hostname
-        try:
-            self.server_info = ServerConnectivityInfo(
-                    hostname=self.hostname,
-                    tls_server_name_indication=self.hostname,
-            )
-            self.server_info.test_connectivity_to_server()
-        except ServerConnectivityError as e:
-            # Could not establish an SSL connection to the server
-            raise RuntimeError(
-                    'Error when connecting to {}: {}'.format(
-                            hostname, e.error_msg)
-            )
-        self.synchronous_scanner = SynchronousScanner()
         self.ciphers = {
             'ssl20': [],
             'ssl30': [],
@@ -52,9 +39,31 @@ class SSLScanner(object):
         self.headers = False
         self.redirects_http = False
         self.errors = []
+        self.connected = False
+        try:
+            self.server_info = ServerConnectivityInfo(
+                    hostname=self.hostname,
+                    tls_server_name_indication=self.hostname,
+            )
+            self.server_info.test_connectivity_to_server()
+        except ServerConnectivityError as e:
+            # Could not establish an SSL connection to the server
+            logger.error('RuntimeError: {}'.format(e.error_msg))
+            self.errors.append('RuntimeError: {}'.format(e.error_msg))
+            # raise RuntimeError(
+            #         'Error when connecting to {}: {}'.format(
+            #                 hostname, e.error_msg)
+            # )
+            return
+        logger.debug('connectivity o.k.')
+        self.synchronous_scanner = SynchronousScanner()
+        self.connected = True
+        logger.debug('init complete')
 
     @property
     def hsts_header(self):
+        if not self.connected:
+            return None
         if not self.headers.hsts_header:
             return None
         rv = 'Maxage: {}'.format(self.headers.hsts_header.max_age)
@@ -72,6 +81,8 @@ class SSLScanner(object):
 
     @property
     def hpkp_header(self):
+        if not self.connected:
+            return None
         if not self.headers.hpkp_header:
             return None
         rv = 'Maxage: {}'.format(self.headers.hpkp_header.max_age)
@@ -96,6 +107,8 @@ class SSLScanner(object):
 
     @property
     def public_key(self):
+        if not self.connected:
+            return None
         public_key = self.cert_info.certificate_chain[0].public_key()
         if isinstance(public_key, rsa.RSAPublicKey):
             return 'RSA key: {}bit, Exponent {}'.format(
@@ -104,6 +117,8 @@ class SSLScanner(object):
 
     @property
     def signature(self):
+        if not self.connected:
+            return None
         cert = self.cert_info.certificate_chain[0]
         return cert.signature_hash_algorithm.name
 
@@ -290,6 +305,8 @@ class SSLScanner(object):
                     'Got exception {} when checking http redirect'.format(e))
 
     def scan(self):
+        if not self.connected:
+            return
         self.check_http_redirect()
         logger.debug('check_http_redirect() done')
         self._get_certificate_info()
