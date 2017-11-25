@@ -45,7 +45,7 @@ class SSLScanner(object):
                     hostname=self.hostname,
                     tls_server_name_indication=self.hostname,
             )
-            self.server_info.test_connectivity_to_server()
+            self.server_info.test_connectivity_to_server(network_timeout=1)
         except ServerConnectivityError as e:
             # Could not establish an SSL connection to the server
             logger.error('RuntimeError: {}'.format(e.error_msg))
@@ -318,4 +318,4 @@ class SSLScanner(object):
         self.scan_heartbleed()
         logger.debug('scan_heartbleed() done')
         self.scan_opensslccs()
-        logger.debug('scan_opensslccs) done')
+        logger.debug('scan_opensslccs done')
