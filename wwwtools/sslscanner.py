@@ -97,6 +97,8 @@ class SSLScanner(object):
 
     @property
     def cert0_subject(self):
+        if not self.connected:
+            return None
         rv = ''
         cert = self.cert_info.certificate_chain[0]
         for attrib in cert.subject:
