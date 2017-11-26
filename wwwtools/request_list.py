@@ -59,9 +59,13 @@ class RequestList:
                     requests[req_id].referrer = dict_val(
                             'Referer', rp['request']['headers'])
             elif entry['method'] == 'Network.requestServedFromCache':
+                if req_id not in requests:
+                    continue
                 requests[req_id] = Request(req_id)
                 requests[req_id].from_cache = True
             elif entry['method'] == 'Network.responseReceived':
+                if req_id not in requests:
+                    continue
                 rpr = rp['response']
                 requests[req_id].mime_type = rpr['mimeType']
                 requests[req_id].status_code = rpr['status']
@@ -81,9 +85,13 @@ class RequestList:
                     requests[req_id].cookie_sent = dict_val(
                             'Cookie', rpr['requestHeaders'])
             elif entry['method'] == 'Network.loadingFinished':
+                if req_id not in requests:
+                    continue
                 requests[req_id].timestamp_end = rp['timestamp']
                 requests[req_id].complete = True
             elif entry['method'] == 'Network.loadingFailed':
+                if req_id not in requests:
+                    continue
                 requests[req_id].timestamp_end = rp['timestamp']
                 requests[req_id].complete = True
                 requests[req_id].failed = True
