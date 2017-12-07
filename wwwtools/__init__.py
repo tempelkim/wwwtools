@@ -7,6 +7,6 @@ from .dom_storage import DOMStorage
 from .request import Request
 from .request_list import RequestList
 from .geo_ip import GeoIP
-from .utility import fetch_page, percentage, tex_esc
+from .utility import fetch_page, percentage, tex_esc, ucode_fix
 from .sslscanner import SSLScanner
 from .ciphersuite import CipherSuite

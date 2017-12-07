@@ -94,6 +94,11 @@ def repl(match):
     return b'XXXXX'
 
 
+def ucode_fix(text):
+    text = text.replace("😃", ":-)")
+    return text
+
+
 def tex_esc(text):
     text = text.replace("\\", "\\textbackslash")
     text = text.replace('″', '"')
@@ -107,4 +112,5 @@ def tex_esc(text):
     text = text.replace("$", "\\$")
     text = text.replace("^", "\\textasciicircum{}")
     text = text.replace("~", "\\textasciitilde{}")
+    # text = text.replace("😃", ":-)")
     return text
