@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
         name='wwwtools',
-        version='0.1.5',
+        version='0.1.6',
         description='Collection of tools for exploring and analyzing the web',
         url='https://github.com/tempelkim/wwwtools',
         author='Boris Kimmina',

@@ -25,6 +25,12 @@ class DOMStorage(object):
     @property
     def ltx_value(self):
         if self.value:
+            if type(self.value) is bool:
+                value_size = 1
+            else:
+                value_size = len(self.value)
+            if value_size > 256:
+                return 'DATA (size {} bytes)'.format(value_size)
             return tex_esc(html_parser.unescape(self.value))
         return '-'
 
