@@ -271,11 +271,12 @@ class CipherSuite:
                         self.score = 0
                         return
                 self.key_strength = rsa_equiv(kex['pubkey'], pubkey.key_size)
-                pk_exponent = pubkey.public_numbers().e
-                if pk_exponent == 1:
-                    self.key_strength = 0
-                    self.score = 0
-                    return
+                if hasattr(pubkey.public_numbers(), 'e'):
+                    pk_exponent = pubkey.public_numbers().e
+                    if pk_exponent == 1:
+                        self.key_strength = 0
+                        self.score = 0
+                        return
         self.get_score()
 
     def get_score(self):
