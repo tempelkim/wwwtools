@@ -126,6 +126,7 @@ class RequestList:
 
     def __next__(self):
         if self.current >= self.num_reqs:
+            self.current = 0
             raise StopIteration
         else:
             self.current += 1
