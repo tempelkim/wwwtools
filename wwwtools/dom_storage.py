@@ -11,7 +11,10 @@ class DOMStorage(object):
 
     def __init__(self, storage_event):
         self.action = storage_event['method'][21:]
-        self.key = storage_event['params']['key']
+        if 'key' in storage_event['params']:
+            self.key = storage_event['params']['key']
+        else:
+            self.key = None
         self.value = False
         self.origin = storage_event['params']['storageId']['securityOrigin']
         self.is_local = storage_event['params']['storageId']['isLocalStorage']
@@ -36,7 +39,9 @@ class DOMStorage(object):
 
     @property
     def cl_key(self):
-        return urllib.parse.unquote(self.key)
+        if self.key:
+            return urllib.parse.unquote(self.key)
+        return '-'
 
     def __str__(self):
         return '{}: {} {}'.format(self.origin, self.action, self.key)
