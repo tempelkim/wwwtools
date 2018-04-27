@@ -1,5 +1,6 @@
 import logging
 import urllib
+import re
 from .utility import tex_esc
 import html.parser
 
@@ -23,7 +24,10 @@ class DOMStorage(object):
 
     @property
     def ltx_key(self):
-        return tex_esc(urllib.parse.unquote(self.key))
+        if re.match('^[ -~]+$', self.key):
+            return tex_esc(urllib.parse.unquote(self.key))
+        else:
+            return 'DATA (size {} bytes)'.format(len(self.key))
 
     @property
     def ltx_value(self):
@@ -34,7 +38,10 @@ class DOMStorage(object):
                 value_size = len(self.value)
             if value_size > 256:
                 return 'DATA (size {} bytes)'.format(value_size)
-            return tex_esc(html_parser.unescape(self.value))
+            if re.match('^[ -~]+$', self.value):
+                return tex_esc(html_parser.unescape(self.value))
+            else:
+                return 'DATA (size {} bytes)'.format(len(self.value))
         return '-'
 
     @property

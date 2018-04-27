@@ -44,6 +44,10 @@ class Cookie:
         return tex_esc(self.name)
 
     @property
+    def ltx_path(self):
+        return tex_esc(self.path)
+
+    @property
     def ltx_value(self):
         # return tex_esc(wrapper.fill(self.value))
         return tex_esc(self.value)
