@@ -24,10 +24,13 @@ class DOMStorage(object):
 
     @property
     def ltx_key(self):
-        if re.match('^[ -~]+$', self.key):
-            return tex_esc(urllib.parse.unquote(self.key))
+        if self.key:
+            if re.match('^[ -~]+$', self.key):
+                return tex_esc(urllib.parse.unquote(self.key))
+            else:
+                return 'DATA (size: {} bytes)'.format(len(self.key))
         else:
-            return 'DATA (size: {} bytes)'.format(len(self.key))
+            return None
 
     @property
     def ltx_value(self):
